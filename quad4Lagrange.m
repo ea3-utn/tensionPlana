@@ -66,9 +66,9 @@ function [KG,fq]=quad4Lagrange(ABSCISAS,ORDENADAS,t,distribuidaX,distribuidaY)
 
       
 	
-      distriX=find(distribuidaX(1,1)==u & distribuidaX(1,2)==v);
+      distriX=find(distribuidaX(:,1)==u & distribuidaX(:,2)==v);
 
-      distriY=find(distribuidaY(1,1)==u & distribuidaY(1,2)==v);
+      distriY=find(distribuidaY(:,1)==u & distribuidaY(:,2)==v);
      
       if (isempty(distriX)==0)
 	

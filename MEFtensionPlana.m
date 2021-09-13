@@ -74,6 +74,12 @@ CsiX=5; # Coordenada LOCAL del elemento para obtener estado de tension
 
 CsiY=1;
 
+###---- Caracteristicas del elemento
+
+anchoElemento=b/ABSCISAS(3);
+
+altoElemento=alto/ORDENADAS(3);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  SCRIPT 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -206,6 +212,6 @@ FY=sum(P(2:2:end))-sum(fq(2:2:end)) % sumatoria en Y
 ####### ---------- POST PROCESADO
 
 
-[deformaciones]=quad4LagrangePostPro(CoX,CoY,CsiX,CsiY,U,b,alto,E,nu,ABSCISAS);
+[deformaciones]=quad4LagrangePostPro(CoX,CoY,CsiX,CsiY,U,anchoElemento,altoElemento,E,nu,ABSCISAS);
 
 keyboard

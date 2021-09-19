@@ -25,32 +25,50 @@ color=["k","r","g","b","m","c","k","r","g","b","m","c"];
 
 ## CARACTERISTICAS DEL MATERIAL
 
-t=.364;
+t=2*.762e-3;
 
-b=10;
+b=508e-3;
 
-alto=10;
+alto=152.4e-3;
 
-E=30e6;
+E=70e9;
 
-nu=.3;
+G=5e9;
 
+#nu=.33;
+
+nu=.1;
+
+P=1000;
+
+h=17.8e-3;
+
+q=P/(t*h);
+
+qUnitaria=q/t;
 
 ## GEOMETRIA Y DISCRETIZACION
 
-ABSCISAS=[0 b 1 E nu];% [Xi Xf Discretizacion E nu]
+ABSCISAS=[0 b 2 E nu G];% [Xi Xf Discretizacion E nu G]
 
-ORDENADAS=[0 alto 1];% [Xi Xf Discretizacion]
+ORDENADAS=[0 alto 2];% [Xi Xf Discretizacion]
 
 ## CARGAS Y CONDICIONES DE CONTORNO
 
-CCx=[1 0;2 0;3 0]; # [Ni CC]
+CCx=[3 0;6 0;9 0]; # [Ni CC]
 
-CCy=[1 0;2 0;3 0]; # [Ni C]C
+CCy=[3 0;6 0;9 0]; # [Ni C]C
 
-CARGAx=[4 2000]; # [Ni CC]
+CARGAx=[]; # [Ni CC]
 
-CARGAy=[4 1000]; # [Ni CC]
+CARGAy=[]; # [Ni CC]
+
+
+###---- Caracteristicas del elemento
+
+anchoElemento=b/ABSCISAS(3);
+
+altoElemento=alto/ORDENADAS(3);
 
 ###---- Cargas distribuidas
 
@@ -60,7 +78,7 @@ CARGAy=[4 1000]; # [Ni CC]
 % 2  yi yf --> Rango de integracion de la carga EN COORDENADAS LOCALES DEL ELEMENTO
 % 3  Xo --> De que lado se aplica la carga, puede valer 0 o el Ancho/alto DEL ELEMENTO (Recordar que son coordenadas locales)
 
-distribuidaX=[0 0 0 0 0 0]; #   -------> Tiene que estar en ceros si no se usa
+distribuidaX=[1 1 altoElemento-h/2 altoElemento 0 -q;1 2 0 h/2 0 -q]; #   -------> Tiene que estar en ceros si no se usa
 
 distribuidaY=[0 0 0 0 0 0]; # [xi xf Yo Qx] -------> Tiene que estar en ceros si no se usa
 
@@ -70,24 +88,19 @@ CoX=1; # Coordenada X del elemento de interes
 
 CoY=1;
 
-CsiX=5; # Coordenada LOCAL del elemento para obtener estado de tension
+CsiX=0; # Coordenada LOCAL del elemento para obtener estado de tension
 
-CsiY=1;
-
-###---- Caracteristicas del elemento
-
-anchoElemento=b/ABSCISAS(3);
-
-altoElemento=alto/ORDENADAS(3);
-
+CsiY=altoElemento;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  SCRIPT 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-[KG,fq]=quad4Lagrange(ABSCISAS,ORDENADAS,t,distribuidaX,distribuidaY);
+#[KG,fq]=quad4Lagrange(ABSCISAS,ORDENADAS,t,distribuidaX,distribuidaY);
 
+[KG,fq]=quad4LagrangeOrto(ABSCISAS,ORDENADAS,t,distribuidaX,distribuidaY);
 
+keyboard
 
 GL=size(KG,1); % Cant. de grados de libertad globales
 
@@ -212,6 +225,14 @@ FY=sum(P(2:2:end))-sum(fq(2:2:end)) % sumatoria en Y
 ####### ---------- POST PROCESADO
 
 
-[deformaciones]=quad4LagrangePostPro(CoX,CoY,CsiX,CsiY,U,anchoElemento,altoElemento,E,nu,ABSCISAS);
+#[tension]=quad4LagrangePostPro(CoX,CoY,CsiX,CsiY,U,anchoElemento,altoElemento,E,nu,ABSCISAS);
+
+[tension]=quad4LagrangeOrtoPostPro(CoX,CoY,CsiX,CsiY,U,anchoElemento,altoElemento,E,nu,G,ABSCISAS);
+
+aster=dlmread("matrizRigidez.csv")*t;
+
+sort(diag(KG))
+
+sort(diag(aster))
 
 keyboard
